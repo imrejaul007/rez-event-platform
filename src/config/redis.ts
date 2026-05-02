@@ -17,6 +17,11 @@ export function getRedis(): Redis {
   return redis;
 }
 
+export async function connectRedis(): Promise<void> {
+  getRedis();
+  logger.info('Redis connection initialized');
+}
+
 export async function disconnectRedis(): Promise<void> {
   if (redis) {
     await redis.quit();
