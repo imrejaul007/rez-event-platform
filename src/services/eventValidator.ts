@@ -77,6 +77,12 @@ const KNOWN_SCHEMAS = [
   PaymentSuccessEventSchema,
 ] as const;
 
+// Union type for all events
+export type AnyEvent =
+  | z.infer<typeof InventoryLowEventSchema>
+  | z.infer<typeof OrderCompletedEventSchema>
+  | z.infer<typeof PaymentSuccessEventSchema>;
+
 // ── Validation utility ──────────────────────────────────────────────────────
 
 export class EventValidationError extends Error {
@@ -89,7 +95,7 @@ export class EventValidationError extends Error {
   }
 }
 
-export function validateEvent(payload: unknown): z.infer<typeof InventoryLowEventSchema> {
+export function validateEvent(payload: unknown): AnyEvent {
   // Try known schemas first
   for (const schema of KNOWN_SCHEMAS) {
     const result = schema.safeParse(payload);
@@ -114,7 +120,7 @@ export function validateEvent(payload: unknown): z.infer<typeof InventoryLowEven
     source: (payload as Record<string, unknown>).source,
   });
 
-  return payload as z.infer<typeof InventoryLowEventSchema>;
+  return payload as AnyEvent;
 }
 
 export function getKnownEventTypes(): string[] {
